@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      const base = '/petcare-assist/';
+      const path = window.location.pathname.startsWith(base)
+        ? window.location.pathname.slice(base.length)
+        : window.location.pathname.replace(/^\/+/, '');
+      const target = base + '?path=' + encodeURIComponent(path + window.location.search + window.location.hash);
+      window.location.replace(target);
+    </script>
+    <title>PetCare Assist</title>
+  </head>
+  <body>Redirecting to PetCare Assist…</body>
+</html>
