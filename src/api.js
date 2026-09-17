@@ -1,3 +1,13 @@
+function toBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
+
 export async function askAssistant(message, pet) {
   const response = await fetch('/api/assistant', {
     method: 'POST',
@@ -10,8 +20,7 @@ export async function askAssistant(message, pet) {
 }
 
 export async function analyzeDocument(file, pet) {
-  const data = await file.arrayBuffer();
-  const base64 = btoa(String.fromCharCode(...new Uint8Array(data)));
+  const base64 = toBase64(await file.arrayBuffer());
   const response = await fetch('/api/documents/analyze', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
