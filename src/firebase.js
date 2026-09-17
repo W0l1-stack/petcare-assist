@@ -12,6 +12,10 @@ function assertReady() {
   if (!firebaseReady) throw new Error('Firebase is not configured yet. Add the Firebase environment variables to the GitHub Actions secrets.');
 }
 
+function assertToken(idToken) {
+  if (!idToken) throw new Error('Your Firebase session is missing an ID token. Please sign in again.');
+}
+
 async function parse(response) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
@@ -23,6 +27,7 @@ async function parse(response) {
 
 export function friendlyFirebaseError(error) {
   const text = String(error?.message || error);
+  const normalized = text.toUpperCase().replaceAll(' ', '_');
   const map = {
     EMAIL_EXISTS: 'That email is already registered. Try signing in instead.',
     INVALID_LOGIN_CREDENTIALS: 'The email or password is incorrect.',
@@ -32,9 +37,11 @@ export function friendlyFirebaseError(error) {
     OPERATION_NOT_ALLOWED: 'Email/password sign-in is not enabled in Firebase yet.',
     TOO_MANY_ATTEMPTS_TRY_LATER: 'Too many attempts. Please wait and try again.',
     INVALID_EMAIL: 'Enter a valid email address.',
-    TOKEN_EXPIRED: 'Your session expired. Please sign in again.'
+    TOKEN_EXPIRED: 'Your session expired. Please sign in again.',
+    PERMISSION_DENIED: 'Firebase denied access to your data. Publish the Firestore rules from firestore.rules, then sign in again.',
+    MISSING_OR_INSUFFICIENT_PERMISSIONS: 'Firebase denied access to your data. Publish the Firestore rules from firestore.rules, then sign in again.'
   };
-  const key = Object.keys(map).find(k => text.includes(k));
+  const key = Object.keys(map).find(k => normalized.includes(k));
   return key ? map[key] : text;
 }
 
@@ -68,6 +75,7 @@ export async function refreshSession(refreshToken) {
 
 export async function updateAccount(idToken, values) {
   assertReady();
+  assertToken(idToken);
   return parse(await fetch(authUrl('accounts:update'), {
     method: 'POST', headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ idToken, ...values, returnSecureToken: true })
@@ -100,6 +108,8 @@ function fromValue(value) {
 
 export async function loadAppData(idToken, uid) {
   assertReady();
+  assertToken(idToken);
+  if (!uid) throw new Error('Your Firebase session is missing a user ID. Please sign in again.');
   const path = `${firestoreBase()}/users/${encodeURIComponent(uid)}/app/data`;
   const response = await fetch(path, { headers: { Authorization: `Bearer ${idToken}` } });
   if (response.status === 404) return null;
@@ -109,6 +119,8 @@ export async function loadAppData(idToken, uid) {
 
 export async function saveAppData(idToken, uid, state) {
   assertReady();
+  assertToken(idToken);
+  if (!uid) throw new Error('Your Firebase session is missing a user ID. Please sign in again.');
   const path = `${firestoreBase()}/users/${encodeURIComponent(uid)}/app/data`;
   const fields = Object.fromEntries(Object.entries(state).map(([k,v]) => [k, toValue(v)]));
   return parse(await fetch(path, {
@@ -119,6 +131,8 @@ export async function saveAppData(idToken, uid, state) {
 
 export async function uploadUserFile(idToken, uid, file, folder = 'documents') {
   assertReady();
+  assertToken(idToken);
+  if (!uid) throw new Error('Your Firebase session is missing a user ID. Please sign in again.');
   if (!STORAGE_BUCKET) throw new Error('Firebase Storage bucket is not configured.');
   if (file.size > 10 * 1024 * 1024) throw new Error('Files must be 10 MB or smaller.');
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
