@@ -1,0 +1,46 @@
+name: Deploy Firebase Rules
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'firebase.json'
+      - 'firestore.rules'
+      - 'storage.rules'
+      - '.github/workflows/firebase-rules.yml'
+
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Firebase CLI
+        run: npm install --global firebase-tools
+
+      - name: Authenticate with Firebase service account
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          test -n "$FIREBASE_SERVICE_ACCOUNT" || {
+            echo "Missing GitHub secret: FIREBASE_SERVICE_ACCOUNT"
+            exit 1
+          }
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
+          node -e "JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/firebase-service-account.json','utf8'))"
+
+      - name: Deploy Firestore and Storage rules
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
+        run: firebase deploy --only firestore:rules,storage --project pets-assist --non-interactive
+
+      - name: Remove credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/firebase-service-account.json"
