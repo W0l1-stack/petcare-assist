@@ -4,6 +4,24 @@ PetCare Assist is a mobile-first pet wellness companion for keeping a pet's acti
 
 The project is designed around a simple principle: useful pet-care organization without pretending to be a veterinarian, insurer, or emergency service.
 
+## Live app
+
+**GitHub Pages:** https://w0l1-stack.github.io/petcare-assist/
+
+## App pages
+
+| Page | Link | Description |
+|---|---|---|
+| Home | https://w0l1-stack.github.io/petcare-assist/ | Overview of the pet journey, recent activity, quick actions, and care snapshot. |
+| My Pet | https://w0l1-stack.github.io/petcare-assist/pet | Pet profile with identity, insurance details, care score, walks, wellness, and documents. |
+| Activity | https://w0l1-stack.github.io/petcare-assist/activity | Start and finish walks, capture GPS distance when available, and review walk history. |
+| Wellness | https://w0l1-stack.github.io/petcare-assist/wellness | Keep simple care routines, completed tasks, and wellness observations. |
+| Rewards | https://w0l1-stack.github.io/petcare-assist/rewards | View PetCare Points, earning rules, and the points history. |
+| Documents | https://w0l1-stack.github.io/petcare-assist/documents | Upload pet-care documents, review Gemini-extracted information, and identify missing or uncertain fields. |
+| Assistant | https://w0l1-stack.github.io/petcare-assist/assistant | Ask the PetCare Assistant to explain user-provided pet-care information and documents. |
+
+The page URLs are real client-side routes. GitHub Pages is configured with an SPA fallback so refreshing a route such as `/activity` does not fall back to a GitHub 404 page.
+
 ## What it does
 
 - **Pet profile**: name, species, breed, date of birth, insurance details, and profile photo.
@@ -108,7 +126,7 @@ The development setup uses Vite for the frontend and Express for the API.
 
 ## Current prototype status
 
-The core mobile product shell, pet profile, activity tracking, wellness routines, rewards ledger, document upload/review flow, assistant UI, and scoring logic are implemented.
+The core mobile product shell, pet profile, activity tracking, wellness routines, rewards ledger, document upload/review flow, assistant UI, scoring logic, clean client-side routes, and GitHub Pages deployment configuration are implemented.
 
 The next product layer is persistence and production hardening: authenticated users, database-backed records, a more complete claim-preparation workflow, editable document fields, real reward redemption, and stronger activity-history analytics.
 
