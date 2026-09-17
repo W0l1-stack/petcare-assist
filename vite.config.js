@@ -17,8 +17,16 @@ const ROUTE_PATHS = { home: '/', pet: '/pet', activity: '/activity', wellness: '
 const ROUTE_BASE = import.meta.env.BASE_URL;
 function routeFromLocation() {
   let path = window.location.pathname;
-  if (ROUTE_BASE !== '/' && path.startsWith(ROUTE_BASE)) path = path.slice(ROUTE_BASE.length);
-  else if (ROUTE_BASE !== '/' && path === ROUTE_BASE.slice(0, -1)) path = '';
+  const requestedPath = new URLSearchParams(window.location.search).get('path');
+  if (requestedPath && (ROUTE_BASE === '/' || path === ROUTE_BASE || path === ROUTE_BASE.slice(0, -1))) {
+    path = requestedPath;
+    const cleanPath = path.replace(/^\\/+/, '');
+    window.history.replaceState({}, '', ROUTE_BASE + cleanPath);
+  } else if (ROUTE_BASE !== '/' && path.startsWith(ROUTE_BASE)) {
+    path = path.slice(ROUTE_BASE.length);
+  } else if (ROUTE_BASE !== '/' && path === ROUTE_BASE.slice(0, -1)) {
+    path = '';
+  }
   path = path.replace(/^\\/+|\\/+$/g, '');
   return Object.entries(ROUTE_PATHS).find(([, value]) => value.replace(/^\\//, '') === path)?.[0] || 'home';
 }
