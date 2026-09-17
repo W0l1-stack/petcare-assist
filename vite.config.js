@@ -28,7 +28,7 @@ export default defineConfig({
           "  window.history.pushState({}, '', base + target);",
           "  window.scrollTo(0, 0);",
           "}"
-        ].join('\\n') + '\\n';
+        ].join('\n') + '\n';
 
         return routing + code
           .replace("const [state,setState]=useState(load); const [tab,setTab]=useState('home');", "const [state,setState]=useState(load); const [tab,setTab]=useState(routeFromLocation); const updateTab=setTab; const navigate=next=>{updateTab(next); navigateTo(next)}; useEffect(()=>{const onPop=()=>updateTab(routeFromLocation()); window.addEventListener('popstate',onPop); return()=>window.removeEventListener('popstate',onPop)},[]);")
