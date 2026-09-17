@@ -1,10 +1,14 @@
-export function calculateCareScore({ walks = [], wellness = [], careTasks = [] }) {
-  if (!walks.length && !wellness.length && !careTasks.length) return null;
-  const recentWalkMinutes = walks.filter(w => Date.now() - new Date(w.date).getTime() <= 7 * 86400000).reduce((sum, w) => sum + (w.minutes || 0), 0);
+export function calculateCareScore({ walks = [], wellness = [], journal = [], careTasks = [], routines = [] }) {
+  const notes = wellness.length + journal.length;
+  const tasks = careTasks.length ? careTasks : routines;
+  if (!walks.length && !notes && !tasks.length) return null;
+  const recent = walks.filter(w => Date.now() - new Date(w.date).getTime() <= 7 * 86400000);
+  const recentWalkMinutes = recent.reduce((sum, w) => sum + (w.minutes || 0), 0);
   const weeklyWalkScore = Math.min(45, recentWalkMinutes * 1.5);
-  const consistencyScore = Math.min(25, new Set(walks.filter(w => Date.now() - new Date(w.date).getTime() <= 7 * 86400000).map(w => new Date(w.date).toDateString())).size * 5);
-  const wellnessScore = Math.min(15, wellness.length * 3);
-  const routineScore = Math.min(15, careTasks.filter(t => t.completed).length * 3);
+  const consistencyScore = Math.min(25, new Set(recent.map(w => new Date(w.date).toDateString())).size * 5);
+  const wellnessScore = Math.min(15, notes * 3);
+  const completedRoutines = tasks.filter(t => t.completed || t.lastCompleted).length;
+  const routineScore = Math.min(15, completedRoutines * 3);
   return Math.round(Math.min(100, weeklyWalkScore + consistencyScore + wellnessScore + routineScore));
 }
 
