@@ -29,10 +29,10 @@ jobs:
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-service-account.json"
           node -e "JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/firebase-service-account.json','utf8'))"
 
-      - name: Deploy Firestore and Storage rules
+      - name: Deploy Firestore rules
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/firebase-service-account.json
-        run: firebase deploy --only firestore:rules,storage --project pets-assist --non-interactive
+        run: firebase deploy --only firestore:rules --project pets-assist --non-interactive
 
       - name: Remove credentials
         if: always()
