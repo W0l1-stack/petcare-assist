@@ -2,13 +2,6 @@ name: Deploy Firebase Rules
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'firebase.json'
-      - 'firestore.rules'
-      - 'storage.rules'
-      - '.github/workflows/firebase-rules.yml'
 
 jobs:
   deploy-rules:
