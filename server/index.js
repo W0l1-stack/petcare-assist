@@ -92,7 +92,7 @@ app.post('/api/documents/analyze', async (req, res) => {
 
 const dist = path.resolve(__dirname, '../dist');
 app.use(express.static(dist));
-app.get('*', (req, res, next) => {
+app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) return next();
   res.sendFile(path.join(dist, 'index.html'));
 });
